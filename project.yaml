@@ -1,0 +1,30 @@
+name: coding
+version: "1.0.0"
+author: mkucharz
+description: >
+  A general coding blueprint for the Memory knowledge graph. Installs the
+  product-specs pack (Capability, Requirement, Scenario, Change, Artifact,
+  TaskGroup, Task, Release, TestSuite) and the ui-patterns pack (UIPattern,
+  UIComponent, UIVariant, UIRule), plus the product-specs authoring skill.
+  Specs, UI patterns, components and their governing rules become queryable
+  graph data instead of drifting repository documents.
+repositoryUrl: https://github.com/mkucharz/coding-blueprint
+
+projectInfo: |
+  # Coding Blueprint
+
+  A coding knowledge base for a Memory project. It carries two schema packs:
+
+  - `product-specs` — an OpenSpec-style spec workflow modelled directly in the
+    graph: capabilities accumulate requirements, requirements carry WHEN/THEN
+    scenarios, changes propose and deliver them, releases anchor delivery, and
+    test suites verify independently of delivery.
+  - `ui-patterns` — the web-UI pattern catalogue: page recipes (`UIPattern`),
+    the reusable elements those recipes are built from (`UIComponent`), the
+    variant axes each component exposes (`UIVariant`), and the cross-cutting
+    constraints (`UIRule`) that govern both.
+
+  The graph is the source of truth. This blueprint installs the types and one
+  bundled authoring skill; it ships no agents and no seed catalogue. Populate
+  the project graph from its own source, or install the catalogue separately,
+  rather than keeping a second copy in the blueprint.

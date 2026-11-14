@@ -1,0 +1,367 @@
+name: product-specs
+version: "0.2.0"
+description: >
+  Product-spec schema for the Memory knowledge graph. Models an OpenSpec-style
+  spec workflow — capabilities, requirements, scenarios, changes, artifacts,
+  task groups, tasks — together with release-anchored delivery and test-suite
+  verification. Lets product specs live in the graph instead of repository
+  files while keeping a queryable product timeline.
+
+author: mkucharz
+license: MIT
+repositoryUrl: https://github.com/mkucharz/coding-blueprint
+
+objectTypes:
+  - name: Capability
+    label: Capability
+    ui:
+      icon: layers
+      color: "#6366F1"
+    description: >
+      A durable, product-defined domain of behaviour (e.g. auth, cases,
+      documents) — the graph equivalent of a capability spec. Cumulative: it
+      accumulates requirements over many changes and is never deleted.
+    properties:
+      description:
+        title: Description
+        type: string
+        widget: textarea
+        description: Free-form notes about the capability beyond its purpose statement.
+      name:
+        title: Name
+        type: string
+        description: Human-readable capability name. E.g. Authentication
+      purpose:
+        title: Purpose
+        type: string
+        widget: textarea
+        description: One-paragraph statement of what the capability provides.
+      status:
+        title: Status
+        type: string
+        enum: [active, deprecated]
+        description: Lifecycle state — active while the product still behaves this way.
+
+  - name: Requirement
+    label: Requirement
+    ui:
+      icon: file-text
+      color: "#3B82F6"
+    description: >
+      A single behavioural requirement belonging to a capability. Authored as
+      part of a change (status: proposed) and reconciled onto the capability when
+      the change is archived (status: active). A modification edits the
+      requirement text, producing a new object version rather than a new object.
+    properties:
+      description:
+        title: Description
+        type: string
+        widget: textarea
+        description: Free-form notes about the requirement.
+      migration:
+        title: Migration guidance
+        type: string
+        widget: textarea
+        description: Migration guidance for consumers (only when origin is removed).
+      origin:
+        title: Origin
+        type: string
+        enum: [added, modified, removed]
+        description: How the owning change affects this requirement.
+      reason:
+        title: Removal reason
+        type: string
+        widget: textarea
+        description: Why the requirement is removed (only when origin is removed).
+      status:
+        title: Status
+        type: string
+        enum: [proposed, active, deprecated]
+        description: Lifecycle state — proposed while its change is open, active once archived onto the capability.
+      strength:
+        title: Strength
+        type: string
+        enum: [SHALL, SHOULD, MAY]
+        description: Normative keyword, mirrored from the statement for filtering.
+      text:
+        title: Requirement text
+        type: string
+        widget: textarea
+        description: The requirement statement, including its normative keyword (SHALL/SHOULD/MAY).
+
+  - name: Scenario
+    label: Scenario
+    ui:
+      icon: play
+      color: "#8B5CF6"
+    description: >
+      A concrete WHEN/THEN example attached to a requirement, mirroring the
+      OpenSpec scenario grammar.
+    properties:
+      description:
+        title: Description
+        type: string
+        widget: textarea
+        description: Free-form notes about the scenario.
+      then:
+        title: THEN clauses
+        type: array
+        items:
+          type: string
+        description: One or more THEN clauses. E.g. [the user is authenticated]
+      when:
+        title: WHEN clauses
+        type: array
+        items:
+          type: string
+        description: One or more WHEN clauses. E.g. [a user submits valid credentials]
+
+  - name: Change
+    label: Change
+    ui:
+      icon: git-pull-request
+      color: "#F59E0B"
+    description: >
+      A proposed change to one or more capabilities — the unit of authoring,
+      implementation, delivery, and archive. Equivalent to an OpenSpec change
+      directory.
+    properties:
+      archived_at:
+        title: Archived at
+        type: string
+        description: ISO-8601 archive timestamp, set when the change is archived.
+      base_ref:
+        title: Base ref
+        type: string
+        description: Base branch/ref the change targets. E.g. main
+      created:
+        title: Created
+        type: string
+        description: ISO-8601 creation timestamp.
+      description:
+        title: Description
+        type: string
+        widget: textarea
+        description: One-paragraph summary of what the change does and why.
+      name:
+        title: Name
+        type: string
+        description: Change slug. E.g. add-password-auth
+      status:
+        title: Status
+        type: string
+        enum: [draft, active, implemented, archived]
+        description: Lifecycle state from authoring through archive.
+      workflow:
+        title: Workflow
+        type: string
+        description: Authoring workflow schema. E.g. spec-driven
+
+  - name: Artifact
+    label: Artifact
+    ui:
+      icon: file
+      color: "#64748B"
+    description: >
+      A markdown artifact of a change — its proposal or design document. The
+      full markdown is carried in the body property.
+    properties:
+      body:
+        title: Body
+        type: string
+        widget: textarea
+        description: Full markdown content of the artifact.
+      description:
+        title: Description
+        type: string
+        widget: textarea
+        description: One-line summary of what the artifact covers.
+      kind:
+        title: Kind
+        type: string
+        enum: [proposal, design]
+        description: Which OpenSpec artifact this is.
+      order:
+        title: Order
+        type: number
+        description: Display order within the change.
+
+  - name: TaskGroup
+    label: Task Group
+    ui:
+      icon: package
+      color: "#0EA5E9"
+    description: A numbered section of a change's task list.
+    properties:
+      description:
+        title: Description
+        type: string
+        widget: textarea
+        description: Free-form notes about the group.
+      ordinal:
+        title: Ordinal
+        type: number
+        description: Section number. E.g. 1
+      title:
+        title: Title
+        type: string
+        description: Section title. E.g. Gateway data layer
+
+  - name: Task
+    label: Task
+    ui:
+      icon: check
+      color: "#22C55E"
+    description: An individual checklist item within a task group.
+    properties:
+      description:
+        title: Description
+        type: string
+        widget: textarea
+        description: Free-form notes about the task.
+      done:
+        title: Done
+        type: boolean
+        description: Whether the task is complete.
+      number:
+        title: Number
+        type: string
+        description: Task number within the change as written. E.g. 1.1 — a string because the hierarchy is not a number.
+      text:
+        title: Text
+        type: string
+        widget: textarea
+        description: Task description.
+
+  - name: Release
+    label: Release
+    ui:
+      icon: tag
+      color: "#EF4444"
+    description: >
+      A shipped product release. The authoritative delivery anchor and the
+      product-timeline spine: requirements and changes delivered in it link here
+      via delivered_in.
+    properties:
+      channel:
+        title: Channel
+        type: string
+        description: Release channel. E.g. stable, beta, canary
+      description:
+        title: Description
+        type: string
+        widget: textarea
+        description: One-paragraph summary of the release.
+      name:
+        title: Name
+        type: string
+        description: Human-readable release name.
+      notes:
+        title: Notes
+        type: string
+        widget: textarea
+        description: Release notes.
+      released_at:
+        title: Released at
+        type: string
+        description: ISO-8601 release timestamp.
+      version:
+        title: Version
+        type: string
+        description: Release version. E.g. v1.2.0
+
+  - name: TestSuite
+    label: Test Suite
+    ui:
+      icon: shield-check
+      color: "#14B8A6"
+    description: >
+      A thin, in-pack representation of the test suite that verifies a
+      requirement, so verification stays orthogonal to delivery. A future shared
+      type registry may reconcile this with the code-structure pack's TestSuite.
+    properties:
+      description:
+        title: Description
+        type: string
+        widget: textarea
+        description: What the suite covers and how to run it.
+      name:
+        title: Name
+        type: string
+        description: Test suite identifier.
+      passed_at:
+        title: Passed at
+        type: string
+        description: ISO-8601 timestamp of the last passing run.
+      status:
+        title: Status
+        type: string
+        description: Latest run state. E.g. passed, failed, unknown — open-ended, so not an enum.
+
+# Relationship labels are sentence case, matching the web UI's own type labels
+# ("Works at", not "Works At"). v0.1.0 used title case, which the graph rendered
+# next to the sentence-case ui-patterns edges.
+relationshipTypes:
+  - name: has_requirement
+    label: Has requirement
+    description: A capability owns a requirement.
+    sourceType: Capability
+    targetType: Requirement
+  - name: has_scenario
+    label: Has scenario
+    description: A requirement owns a scenario.
+    sourceType: Requirement
+    targetType: Scenario
+  - name: depends_on
+    label: Depends on
+    description: A capability depends on another capability.
+    sourceType: Capability
+    targetType: Capability
+  - name: proposes_change
+    label: Proposes change
+    description: >
+      A change proposes an added, modified, or removed capability. Carries an
+      operation property: added | modified | removed.
+    sourceType: Change
+    targetType: Capability
+  - name: has_artifact
+    label: Has artifact
+    description: A change owns a proposal or design artifact.
+    sourceType: Change
+    targetType: Artifact
+  - name: has_task_group
+    label: Has task group
+    description: A change owns a task group.
+    sourceType: Change
+    targetType: TaskGroup
+  - name: contains_task
+    label: Contains task
+    description: A task group contains a task.
+    sourceType: TaskGroup
+    targetType: Task
+  - name: addresses
+    label: Addresses
+    description: A task delivers or addresses a requirement.
+    sourceType: Task
+    targetType: Requirement
+  - name: delivered_in
+    label: Delivered in
+    description: >
+      A requirement was delivered in a release. The authoritative delivery edge;
+      Release.released_at is when it shipped.
+    sourceType: Requirement
+    targetType: Release
+  - name: delivered_in
+    label: Delivered in
+    description: >
+      A change was delivered in a release. Shares the delivered_in name with the
+      requirement edge; the two are distinguished by sourceType.
+    sourceType: Change
+    targetType: Release
+  - name: verified_by
+    label: Verified by
+    description: >
+      A requirement is verified by a test suite. Orthogonal to delivered_in: a
+      requirement may be delivered yet unverified, or verified yet unreleased.
+    sourceType: Requirement
+    targetType: TestSuite

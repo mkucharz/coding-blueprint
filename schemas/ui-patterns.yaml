@@ -1,0 +1,466 @@
+name: ui-patterns
+version: "1.2.0"
+description: >
+  The web-ui pattern catalogue as a graph: page recipes (UIPattern), the
+  reusable elements those recipes are built from (UIComponent), the variant
+  axes each component exposes (UIVariant), and the cross-cutting constraints
+  (UIRule) that govern both. Graph-first — each UIPattern carries the
+  instruction, recipe skeleton, test contract and verified source anchors; each
+  UIComponent carries its Go API, variant axes, mobile behaviour and upstream
+  provenance.
+
+author: mkucharz
+license: MIT
+repositoryUrl: https://github.com/mkucharz/coding-blueprint
+
+objectTypes:
+  - name: UIPattern
+    label: UI Pattern
+    ui:
+      icon: layers
+      color: "#8B5CF6"
+    description: >
+      A named, reusable UI affordance — a layout, editing, feedback or widget
+      recipe with a ready-to-paste instruction, a markup skeleton, a test
+      contract and source anchors. Patterns compose components; they never
+      re-declare their markup.
+    properties:
+      avoid_when:
+        title: Avoid when
+        type: string
+        widget: textarea
+        description: When to pick a different pattern instead.
+      category:
+        title: Category
+        type: string
+        enum: [layout, edit, feedback, widget, nav, data-display]
+        description: What kind of affordance this is — picks the catalog section it belongs to.
+      contract_aria:
+        title: Required aria attributes
+        type: array
+        items:
+          type: string
+        description: Required aria attributes. E.g. aria-current=page
+      contract_data:
+        title: Required data attributes
+        type: array
+        items:
+          type: string
+        description: Required data-* hooks. E.g. data-dialog-autoopen
+      contract_hx:
+        title: Required htmx wiring
+        type: array
+        items:
+          type: string
+        description: Required htmx wiring. E.g. hx-swap=none
+      contract_hx_status:
+        title: htmx contract status
+        type: string
+        enum: [documented, not_applicable]
+        description: >
+          documented | not_applicable — not_applicable means the pattern's own
+          markup emits no htmx attributes and any hx-* wiring belongs to the
+          call site under ui-rule-htmx-ownership.
+      contract_other:
+        title: Other contract invariants
+        type: array
+        items:
+          type: string
+        description: Other contract invariants (ids, route shapes, flags).
+      contract_testid:
+        title: Required test id
+        type: string
+        description: Required data-testid anchor. E.g. page-<slug>
+      description:
+        title: Description
+        type: string
+        widget: textarea
+        description: What the pattern is, in one paragraph a reader can scan.
+      doc_section:
+        title: Catalog section
+        type: string
+        description: Section the markdown catalog renders it into. E.g. Layout patterns
+      exception_reason:
+        title: Exception reason
+        type: string
+        widget: textarea
+        description: Why the exception exists; prefer extending the canonical pattern.
+      instruction:
+        title: Instruction
+        type: string
+        widget: textarea
+        description: Ready-to-paste delegation line naming the pattern, target entity and file.
+      is_exception:
+        title: Is an exception
+        type: boolean
+        description: True when this is a documented exception to the canonical pattern.
+      layer:
+        title: Layer
+        type: string
+        enum: [L0, L1, L2, L3, L4]
+        description: Component layer. L0 go-daisy primitive, L1 domain adapter, L2 app composite, L3 page-local helper, L4 page
+      pattern_id:
+        title: Pattern id
+        type: string
+        description: Namespaced stable id. E.g. layout.list, edit.modal, feedback.toast
+      recipe:
+        title: Recipe
+        type: string
+        widget: textarea
+        description: Markup skeleton / code snippet built from real components.
+      recipe_note:
+        title: Recipe note
+        type: string
+        widget: textarea
+        description: Caveat on the recipe — e.g. an inventory-only row's pointer to the shipped markup.
+      recipe_status:
+        title: Recipe status
+        type: string
+        enum: [documented, inventory-only]
+        description: documented | inventory-only — inventory-only means the row names an existing surface; extend it, never fork it.
+      responsive:
+        title: Responsive behaviour
+        type: string
+        widget: textarea
+        description: >
+          How the pattern reflows below the md breakpoint — e.g. "desktop table
+          + mobile card list", "rail collapses to an overlay", "actions collapse
+          into a More menu". Required for a pattern with a desktop-only layout.
+      source_paths:
+        title: Source anchors
+        type: array
+        items:
+          type: string
+        description: Source anchors as file:line. Verified against verified_sha.
+      stack:
+        title: Stacks
+        type: array
+        items:
+          type: string
+        description: Stacks this pattern applies to. E.g. [templ+htmx+alpine], [react+tailwind], [swiftui]
+      status:
+        title: Status
+        type: string
+        enum: [active, experimental, deprecated]
+        description: Whether the pattern is the current answer, a trial, or retired.
+      variant_of:
+        title: Variant of
+        type: string
+        description: pattern_id this is a documented variant of.
+      verified_at:
+        title: Verified at
+        type: string
+        description: ISO-8601 date the anchors were verified.
+      verified_sha:
+        title: Verified sha
+        type: string
+        description: Commit whose line numbers the anchors were checked against.
+      when_to_use:
+        title: When to use
+        type: string
+        widget: textarea
+        description: The task that should select this pattern.
+
+  - name: UIComponent
+    label: UI Component
+    ui:
+      icon: puzzle
+      color: "#3B82F6"
+    description: >
+      One reusable UI element with a stable Go symbol — a go-daisy primitive
+      (origin upstream), a domain adapter, or an app composite. This is the
+      inventory an agent checks before writing markup: if the element already
+      exists here, render it; if it exists upstream, wrap it rather than
+      re-implementing it.
+    properties:
+      a11y:
+        title: Accessibility invariants
+        type: array
+        items:
+          type: string
+        description: Accessibility invariants the component owns (role, aria-*, focus order, name source).
+      adoption_note:
+        title: Adoption note
+        type: string
+        widget: textarea
+        description: >
+          Why a call site cannot use this component yet, and the upstream issue
+          that unblocks it. An adoptionAllowlist entry without a note here (or an
+          upstream issue) is an undocumented exception.
+      axes:
+        title: Variant axes
+        type: array
+        items:
+          type: string
+        description: >
+          Denormalised summary of the variant axes this component exposes
+          (tone, style, size, state, density, shape). The UIVariant entities are
+          the authoritative value sets.
+      category:
+        title: Category
+        type: string
+        enum: [display, form, navigation, feedback, layout, data-display]
+        description: What the element is for, in the component catalog's vocabulary.
+      component_id:
+        title: Component id
+        type: string
+        description: >
+          Stable id — package-symbol. E.g. components.TableCard, ui.Badge,
+          form.ToggleInput. Unique; the key of this inventory.
+      description:
+        title: Description
+        type: string
+        widget: textarea
+        description: What the component renders and when a page reaches for it.
+      go_props:
+        title: Go props
+        type: array
+        items:
+          type: object
+        description: >
+          The component's Go API: [{name, type, required, default, purpose}].
+          Names the variant types it accepts so a caller never guesses.
+      go_symbol:
+        title: Go symbol
+        type: string
+        description: The exported Go/templ symbol. E.g. TableCard
+      layer:
+        title: Layer
+        type: string
+        enum: [L0, L1, L2, L3]
+        description: L0 go-daisy primitive, L1 domain adapter, L2 app composite, L3 page-local helper
+      mobile:
+        title: Mobile behaviour
+        type: string
+        enum: [stack, scroll-x, hide-below-md, overlay, none]
+        description: >
+          Reflow strategy below the md breakpoint — stack | scroll-x |
+          hide-below-md | overlay | none.
+      mobile_min_width:
+        title: Mobile minimum width (px)
+        type: integer
+        description: Narrowest viewport the component is verified at, in px. E.g. 320
+      origin:
+        title: Origin
+        type: string
+        enum: [upstream, gateway-adapter, gateway-local]
+        description: upstream (go-daisy primitive) | gateway-adapter (L1 over upstream) | gateway-local (L2/L3)
+      slots:
+        title: Slots
+        type: array
+        items:
+          type: string
+        description: Slot role names the component exposes. E.g. [Actions, Footer, Empty]
+      source_path:
+        title: Source path
+        type: string
+        description: Where the component is defined. E.g. apps/web-ui/gateway/components/table.templ:10
+      status:
+        title: Status
+        type: string
+        enum: [active, planned, deprecated]
+        description: Whether the component is renderable today, planned, or retired.
+      upstream_ref:
+        title: Upstream reference
+        type: string
+        description: Upstream symbol and version this component wraps. E.g. go-daisy@v0.20.0 components/ui.Badge
+      verified_at:
+        title: Verified at
+        type: string
+        description: ISO-8601 date the anchors were verified.
+      verified_sha:
+        title: Verified sha
+        type: string
+        description: Commit whose line numbers the anchors were checked against.
+
+  - name: UIVariant
+    label: UI Variant Axis
+    ui:
+      icon: tag
+      color: "#10B981"
+    description: >
+      One variant axis of one component: its Go type, the values that are
+      allowed, and the default when the caller omits it. Variants are enumerated
+      so a new value is a deliberate graph change, never an invented fourth
+      variant in a page template.
+    properties:
+      axis:
+        title: Axis
+        type: string
+        enum: [tone, style, size, state, density, shape, align, placement]
+        description: Which visual dimension the axis varies.
+      component_id:
+        title: Component id
+        type: string
+        description: component_id of the owning component. Denormalised from the component_has_variant edge.
+      default:
+        title: Default value
+        type: string
+        description: The value emitted when the caller omits the axis.
+      go_type:
+        title: Go type
+        type: string
+        description: The typed Go enum backing the axis. E.g. ui.BadgeIntent
+      notes:
+        title: Notes
+        type: string
+        widget: textarea
+        description: Alignment rule with the daisyUI class family, or why this axis is not a tone.
+      status:
+        title: Status
+        type: string
+        enum: [active, planned, deprecated]
+        description: Whether the axis is in use today, planned, or retired.
+      values:
+        title: Allowed values
+        type: array
+        items:
+          type: object
+        description: >
+          Allowed values in source order: [{name, value}] — the Go constant and
+          the value it carries. The class list a value emits stays in the
+          component's own mapping function (see source_path), which is what makes
+          the enum and the markup one edit.
+      verified_at:
+        title: Verified at
+        type: string
+        description: ISO-8601 date the anchors were verified.
+      verified_sha:
+        title: Verified sha
+        type: string
+        description: Commit whose line numbers the anchors were checked against.
+
+  - name: UIRule
+    label: UI Rule
+    ui:
+      icon: shield-check
+      color: "#F59E0B"
+    description: >
+      A cross-cutting UI constraint that applies across patterns and components
+      — PRG contract, htmx ownership, component layers, variants, theme
+      tokens, mobile readiness, upstream-first, role gating, untrusted content,
+      test contract. Patterns and components link to the rules that govern
+      them; rules are never duplicated into a pattern.
+    properties:
+      applies_to:
+        title: Applies to
+        type: array
+        items:
+          type: string
+        description: pattern_ids, component_ids or 'all' it governs.
+      category:
+        title: Category
+        type: string
+        enum:
+          - prg
+          - htmx-ownership
+          - component-layers
+          - layout
+          - variants
+          - theme
+          - mobile
+          - upstream
+          - widget-policy
+          - alpine-htmx
+          - role-gating
+          - security
+          - testing
+          - feedback
+        description: The family of constraint the rule belongs to; picks the rule's group in the catalog.
+      description:
+        title: Description
+        type: string
+        widget: textarea
+        description: What the rule constrains, in one paragraph.
+      enforced_by:
+        title: Enforced by
+        type: array
+        items:
+          type: string
+        description: >
+          The instrument that makes the rule checkable rather than advisory —
+          a gate, detector, crawl or review step. E.g. "detector: adoptionGaps",
+          "gate: variant-lint", "crawl: mobile-overflow-390".
+      rationale:
+        title: Rationale
+        type: string
+        widget: textarea
+        description: Why the rule exists — the failure it prevents.
+      rule_id:
+        title: Rule id
+        type: string
+        description: Stable id. E.g. prg-contract, hide-dont-disable
+      source_kind:
+        title: Source kind
+        type: string
+        enum: [mirror-doc, code]
+        description: >
+          What kind of authority source_path names — mirror-doc (the
+          hand-maintained product docs) or code (a gateway/infra anchor).
+      source_path:
+        title: Source path
+        type: string
+        description: Doc/section or code anchor defining the rule.
+      statement:
+        title: Statement
+        type: string
+        widget: textarea
+        description: The rule, in one sentence.
+      status:
+        title: Status
+        type: string
+        enum: [active, superseded]
+        description: Whether the rule is in force or has been replaced.
+      strength:
+        title: Strength
+        type: string
+        enum: [MUST, SHOULD]
+        description: The normative keyword the rule is written with.
+      verified_at:
+        title: Verified at
+        type: string
+        description: ISO-8601 date the rule's source was checked.
+      verified_sha:
+        title: Verified sha
+        type: string
+        description: Commit whose line numbers the rule's anchors were checked against.
+
+relationshipTypes:
+  - name: pattern_governed_by
+    label: Pattern governed by rule
+    description: A pattern is constrained by a cross-cutting UI rule.
+    sourceType: UIPattern
+    targetType: UIRule
+  - name: component_governed_by
+    label: Component governed by rule
+    description: A component is constrained by a cross-cutting UI rule.
+    sourceType: UIComponent
+    targetType: UIRule
+  - name: pattern_uses_component
+    label: Pattern uses component
+    description: A recipe is built from this component.
+    sourceType: UIPattern
+    targetType: UIComponent
+  - name: component_has_variant
+    label: Component has variant axis
+    description: A component exposes this variant axis.
+    sourceType: UIComponent
+    targetType: UIVariant
+  - name: component_wraps
+    label: Component wraps upstream component
+    description: A gateway component wraps, or is an adapter over, an upstream go-daisy component.
+    sourceType: UIComponent
+    targetType: UIComponent
+  # `variant_of` and `supersedes` are declared for the pattern hierarchy but
+  # carry no edges today; they stay because a version bump that drops a
+  # declaration silently stops declaring it (v1.1.0 did exactly that).
+  - name: variant_of
+    label: Pattern variant of
+    description: A pattern is a documented variant of another pattern.
+    sourceType: UIPattern
+    targetType: UIPattern
+  - name: supersedes
+    label: Pattern supersedes
+    description: A pattern replaces an older pattern.
+    sourceType: UIPattern
+    targetType: UIPattern
