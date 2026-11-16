@@ -1,5 +1,5 @@
 name: product-specs
-version: "0.2.0"
+version: "0.2.1"
 description: >
   Product-spec schema for the Memory knowledge graph. Models an OpenSpec-style
   spec workflow — capabilities, requirements, scenarios, changes, artifacts,
@@ -25,6 +25,7 @@ objectTypes:
       description:
         title: Description
         type: string
+        format: markdown
         widget: textarea
         description: Free-form notes about the capability beyond its purpose statement.
       name:
@@ -34,6 +35,7 @@ objectTypes:
       purpose:
         title: Purpose
         type: string
+        format: markdown
         widget: textarea
         description: One-paragraph statement of what the capability provides.
       status:
@@ -56,11 +58,13 @@ objectTypes:
       description:
         title: Description
         type: string
+        format: markdown
         widget: textarea
         description: Free-form notes about the requirement.
       migration:
         title: Migration guidance
         type: string
+        format: markdown
         widget: textarea
         description: Migration guidance for consumers (only when origin is removed).
       origin:
@@ -71,6 +75,7 @@ objectTypes:
       reason:
         title: Removal reason
         type: string
+        format: markdown
         widget: textarea
         description: Why the requirement is removed (only when origin is removed).
       status:
@@ -86,6 +91,7 @@ objectTypes:
       text:
         title: Requirement text
         type: string
+        format: markdown
         widget: textarea
         description: The requirement statement, including its normative keyword (SHALL/SHOULD/MAY).
 
@@ -101,6 +107,7 @@ objectTypes:
       description:
         title: Description
         type: string
+        format: markdown
         widget: textarea
         description: Free-form notes about the scenario.
       then:
@@ -141,6 +148,7 @@ objectTypes:
       description:
         title: Description
         type: string
+        format: markdown
         widget: textarea
         description: One-paragraph summary of what the change does and why.
       name:
@@ -169,11 +177,13 @@ objectTypes:
       body:
         title: Body
         type: string
+        format: markdown
         widget: textarea
         description: Full markdown content of the artifact.
       description:
         title: Description
         type: string
+        format: markdown
         widget: textarea
         description: One-line summary of what the artifact covers.
       kind:
@@ -196,6 +206,7 @@ objectTypes:
       description:
         title: Description
         type: string
+        format: markdown
         widget: textarea
         description: Free-form notes about the group.
       ordinal:
@@ -217,6 +228,7 @@ objectTypes:
       description:
         title: Description
         type: string
+        format: markdown
         widget: textarea
         description: Free-form notes about the task.
       done:
@@ -230,6 +242,7 @@ objectTypes:
       text:
         title: Text
         type: string
+        format: markdown
         widget: textarea
         description: Task description.
 
@@ -250,6 +263,7 @@ objectTypes:
       description:
         title: Description
         type: string
+        format: markdown
         widget: textarea
         description: One-paragraph summary of the release.
       name:
@@ -259,6 +273,7 @@ objectTypes:
       notes:
         title: Notes
         type: string
+        format: markdown
         widget: textarea
         description: Release notes.
       released_at:
@@ -283,6 +298,7 @@ objectTypes:
       description:
         title: Description
         type: string
+        format: markdown
         widget: textarea
         description: What the suite covers and how to run it.
       name:
